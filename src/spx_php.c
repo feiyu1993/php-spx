@@ -556,6 +556,24 @@ void spx_php_ouput_finalize(void)
     SG(headers_sent) = 1;
 }
 
+void spx_php_log_notice(const char * fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+
+    char * buf;
+    const int printed = vasprintf(&buf, fmt, ap);
+    va_end(ap);
+
+    if (printed < 0) {
+        return;
+    }
+
+    zend_error(E_NOTICE, "SPX: %s", buf);
+
+    free(buf);
+}
+
 static int hook_zend_write(const char * str, zend_write_len_t len)
 {
     if (context.output_disabled) {
