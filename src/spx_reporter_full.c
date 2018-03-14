@@ -74,12 +74,16 @@ static metadata_t * metadata_create();
 static void metadata_destroy(metadata_t * metadata);
 static int metadata_save(const metadata_t * metadata, const char * file_name);
 
+#include "main/php.h"
+
 size_t spx_reporter_full_metadata_list_files(
     const char * data_dir,
     void (*callback) (const char *, size_t)
 ) {
+    zend_error(E_NOTICE, "scanning dir: %s", data_dir);
     DIR * dir = opendir(data_dir);
     if (!dir) {
+        zend_error(E_NOTICE, "cannot open %s directory: %s", data_dir, strerror(errno));
         return 0;
     }
 
@@ -87,6 +91,7 @@ size_t spx_reporter_full_metadata_list_files(
     size_t count = 0;
     const struct dirent * entry;
     while ((entry = readdir(dir)) != NULL) {
+        zend_error(E_NOTICE, "scanning file: %s", entry->d_name);
         if (entry->d_type != DT_REG) {
             continue;
         }
